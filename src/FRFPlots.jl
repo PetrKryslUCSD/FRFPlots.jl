@@ -3,13 +3,13 @@ module FRFPlots
 using PGFPlotsX
 using DelimitedFiles
 using DataDrop
-using DataDrop: retrieve_json
+using DataDrop: retrieve_json, with_extension
 using JSON
 using LinearAlgebra
 using Statistics
 using FRFComparisons
 
-export frfplots, measurements, frequencies
+export frfplots, measurements, frequencies, savepdf
 
 const yellow = "rgb,255:red,255;green,225;blue,25"
 const blue = "rgb,255:red,67;green,99;blue,216"
@@ -144,5 +144,8 @@ function frfplots(requests)
     return ax
 end
 
+function savepdf(filename, ax)
+    pgfsave(with_extension(filename, ".pdf"), ax)
+end
 
 end # module FRFPlots

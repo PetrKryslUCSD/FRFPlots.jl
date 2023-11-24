@@ -49,6 +49,7 @@ ax = FRFPlots.frfplots([
     (model, FRFPlots.TPC_L_transverse, false),
     ])
 display(ax)
+savepdf("TPC_L_transverse" * ".pdf", ax)
 
 
 ax = FRFPlots.frfplots([
@@ -56,12 +57,20 @@ ax = FRFPlots.frfplots([
     (model, FRFPlots.TPC_R_transverse, false),
     ])
 display(ax)
+savepdf("TPC_R_transverse" * ".pdf", ax)
 
 ax = FRFPlots.frfplots([
     (experiment, FRFPlots.Skull_transverse, true),
     (model, FRFPlots.Skull_transverse, false),
     ])
 display(ax)
+savepdf("Skull_transverse", ax)
 
+ax = FRFPlots.frfplots([
+    (experiment, FRFPlots.Skull_axial, true),
+    (model, FRFPlots.Skull_axial, false),
+    ])
+display(ax)
+savepdf("Skull_axial", ax)
 
 nothing
