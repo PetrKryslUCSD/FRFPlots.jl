@@ -1,0 +1,14 @@
+name = "FRFPlots"
+uuid = "e897d28e-ebda-49ed-b0b2-e9677a268f3d"
+authors = ["Petr Krysl <pkrysl@ucsd.edu>"]
+version = "0.1.0"
+
+[deps]
+DataDrop = "aa547a04-dd37-49ab-8e73-656744f8a8fc"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+FRFComparisons = "cc5905fa-0ce8-439f-a041-9cb66eb2e712"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PGFPlotsX = "8314cec4-20b6-5062-9cdb-752b83310925"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
