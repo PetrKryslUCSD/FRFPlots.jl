@@ -2,7 +2,13 @@
 	"folders":
 	[
 		{
-			"path": "."
-		}
-	]
+			"path": ".",
+		},
+		{
+			"path": "C:\\Users\\pkonl\\Documents\\00WIP\\DataDrop.jl",
+		},
+		{
+			"path": "C:\\Users\\pkonl\\Documents\\00WIP\\GrayWhale2023\\transdec experiments\\paper #4\\plots_sim"
+		},
+	],
 }
