@@ -9,7 +9,7 @@ using LinearAlgebra
 using Statistics
 using FRFComparisons
 
-export frfplots, measurements, frequencies, savepdf
+export frfplots, measurements, frequencies, savepdf, matrixplot, stats, collect_summaries
 
 const yellow = "rgb,255:red,255;green,225;blue,25"
 const blue = "rgb,255:red,67;green,99;blue,216"
@@ -102,7 +102,7 @@ function frfplots(inputcsv, curves)
     # "point meta min" = "-60.0",
     # "point meta max" = "0.0",
         enlargelimits = false,
-        legend_pos = "south east"
+        legend_pos = "outer north east"
         },
         plots...
         )
@@ -116,9 +116,9 @@ function frfplots(requests)
         inputcsv = r[1]
         freq = frequencies(inputcsv)
         c = r[2]
-        experimental = r[3]
+        label = r[3]
         d = measurements(inputcsv, c)
-        if experimental
+        if label == "E"
             @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, }, Coordinates(freq, d)))
             @pgf push!(plots, LegendEntry("E: " * replace(c, "_" => " ")))
         else
@@ -137,7 +137,7 @@ function frfplots(requests)
         # "point meta min" = "-60.0",
         # "point meta max" = "0.0",
         enlargelimits = false,
-        legend_pos = "south east"
+        legend_pos = "outer north east"
         },
         plots...
         )
@@ -146,6 +146,67 @@ end
 
 function savepdf(filename, ax)
     pgfsave(with_extension(filename, ".pdf"), ax)
+end
+
+function matrixplot(rows, cols, M)
+    plots = []
+    @pgf push!(plots, Plot3({matrix_plot, nodes_near_coords=raw"\pgfmathprintnumber[precision=3]\pgfplotspointmeta"}, Table(1:size(M', 1), 1:size(M', 2), M')))
+    @pgf ax = Axis({
+        view = (0, 90),
+        height = "8cm",
+        width = "8cm",
+        xlabel = cols,
+        ylabel = rows,
+        xticklabels = "{,,low,,nom,,hig}",
+        yticklabels = "{,,low,,nom,,hig}",
+        # grid="major",
+        shader="flat corner",
+        colorbar,
+        "colormap/viridis", # viridis
+            # "point meta min" = "-60.0",
+            # "point meta max" = "0.0",
+        enlargelimits = false
+    },
+    plots...
+    )
+    return ax
+end
+
+function stats(q)
+    q_m = median(q)
+    q_m_ad = 1.4826 * median(abs.(q .- q_m))
+    q_m, q_m_ad
+end
+
+function collect_summaries(n1, n2)
+    all_sensors = [
+    FRFPlots.TPC_L_transverse,
+    FRFPlots.TPC_L_axial,
+    FRFPlots.TPC_R_transverse,
+    FRFPlots.TPC_R_axial,
+    FRFPlots.Skull_transverse,
+    FRFPlots.Skull_axial,
+    FRFPlots.Skull_normal,
+    ]
+    f = frequencies(n1)
+
+    cssf_result = []
+    csac_result = []
+    frfsm_result = []
+    for c in all_sensors
+        f = frequencies(n1)
+        d1 = measurements(n1, c)
+        f = frequencies(n2)
+        d2 = measurements(n2, c)
+            # push!(cssf_result, cssf(f, log10.(d2), log10.(d1)))
+            # push!(csac_result, csac(f, log10.(d2), log10.(d1)))
+            # push!(frfsm_result, frfsm(f, log10.(d2), log10.(d1)))
+        push!(cssf_result, cssf(f, d1, d2))
+        push!(csac_result, csac(f, d2, d1))
+        push!(frfsm_result, frfsm(f, d2, d1))
+    end
+
+    cssf_result, csac_result, frfsm_result
 end
 
 end # module FRFPlots
