@@ -9,7 +9,7 @@ using LinearAlgebra
 using Statistics
 using FRFComparisons
 
-export frfplots, measurements, frequencies, savepdf, matrixplot, stats, collect_summaries
+export frfplots, measurements, frequencies, savepdf, matrixplot, stats, collect_summaries, gof
 
 const yellow = "rgb,255:red,255;green,225;blue,25"
 const blue = "rgb,255:red,67;green,99;blue,216"
@@ -94,8 +94,8 @@ function frfplots(inputcsv, curves)
     @pgf ax = SemiLogYAxis({
         title = "$(replace(inputcsv, "_" => "\\_"))",
         view = (0, 90),
-        height = "9.0cm",
-        width = "11.454cm",
+        height = "7.2cm",
+        width = "9.16cm",
         xlabel = "Frequency [Hz]",
         ylabel = "Amplitude [m/(s**2 Pa)]",
         grid="major",
@@ -119,7 +119,7 @@ function frfplots(requests)
         label = r[3]
         d = measurements(inputcsv, c)
         if label == "E"
-            @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, }, Coordinates(freq, d)))
+            @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, line_width=1 }, Coordinates(freq, d)))
             @pgf push!(plots, LegendEntry("E: " * replace(c, "_" => " ")))
         else
             @pgf push!(plots, Plot({color = colors[c], line_width=2 }, Coordinates(freq, d)))
@@ -138,6 +138,46 @@ function frfplots(requests)
         # "point meta max" = "0.0",
         enlargelimits = false,
         legend_pos = "outer north east"
+        },
+        plots...
+        )
+    return ax
+end
+
+function frfamplificationplots(requests, reference)
+    r = reference
+    inputcsv = r[1]
+    reffreq = frequencies(inputcsv)
+    c = r[2]
+    label = r[3]
+    refd = measurements(inputcsv, c)
+    plots = []
+    for (j, r) in enumerate(requests)
+        inputcsv = r[1]
+        freq = frequencies(inputcsv)
+        c = r[2]
+        label = r[3]
+        d = measurements(inputcsv, c)
+        if label == "E"
+            @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, line_width=1 }, Coordinates(freq, d ./ refd)))
+            @pgf push!(plots, LegendEntry("E: " * replace(c, "_" => " ")))
+        else
+            @pgf push!(plots, Plot({color = colors[c], line_width=2 }, Coordinates(freq, d ./ refd)))
+            @pgf push!(plots, LegendEntry("M: " * replace(c, "_" => " ")))
+        end
+    end
+
+    @pgf ax = SemiLogYAxis({
+        view = (0, 90),
+        height = "9.0cm",
+        width = "11.454cm",
+        xlabel = "Frequency [Hz]",
+        ylabel = "Amplification [ND]",
+        grid="major",
+        # "point meta min" = "-60.0",
+        # "point meta max" = "0.0",
+        enlargelimits = false,
+        legend_pos = "south east"
         },
         plots...
         )
@@ -207,6 +247,34 @@ function collect_summaries(n1, n2)
     end
 
     cssf_result, csac_result, frfsm_result
+end
+
+function gof(n1, n2)
+    all_sensors = [
+    FRFPlots.TPC_L_transverse,
+    FRFPlots.TPC_L_axial,
+    FRFPlots.TPC_R_transverse,
+    FRFPlots.TPC_R_axial,
+    FRFPlots.Skull_transverse,
+    FRFPlots.Skull_axial,
+    FRFPlots.Skull_normal,
+    ]
+    f = frequencies(n1)
+
+    _result = []
+    for c in all_sensors
+        f = frequencies(n1)
+        d1 = measurements(n1, c)
+        f = frequencies(n2)
+        d2 = measurements(n2, c)
+        push!(_result, _gof(d1, d2))
+    end
+
+    _result
+end
+
+function _gof(O, E)
+    sum(@. (O - E)^2 / E)
 end
 
 end # module FRFPlots
