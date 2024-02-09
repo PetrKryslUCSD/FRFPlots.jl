@@ -11,16 +11,16 @@ using FRFComparisons
 
 export frfplots, measurements, frequencies, savepdf, matrixplot, stats, collect_summaries, gof
 
-const yellow = "rgb,255:red,255;green,225;blue,25"
-const blue = "rgb,255:red,67;green,99;blue,216"
-const orange = "rgb,255:red,245;green,130;blue,49"
-const lavender = "rgb,255:red,220;green,190;blue,255"
-const maroon = "rgb,255:red,128;green,0;blue,0"
-const red = "rgb,255:red,255;green,0;blue,0"
-const navy = "rgb,255:red,0;green,0;blue,117"
-const grey = "rgb,255:red,169;green,169;blue,169"
-const white = "rgb,255:red,255;green,255;blue,255"
-const black = "rgb,255:red,0;green,0;blue,0"
+const YELLOW = "rgb,255:red,255;green,225;blue,25"
+const BLUE = "rgb,255:red,67;green,99;blue,216"
+const ORANGE = "rgb,255:red,245;green,130;blue,49"
+const LAVENDER = "rgb,255:red,220;green,190;blue,255"
+const MAROON = "rgb,255:red,128;green,0;blue,0"
+const RED = "rgb,255:red,255;green,0;blue,0"
+const NAVY = "rgb,255:red,0;green,0;blue,117"
+const GREY = "rgb,255:red,169;green,169;blue,169"
+const WHITE = "rgb,255:red,255;green,255;blue,255"
+const BLACK = "rgb,255:red,0;green,0;blue,0"
 
 # Frequency [Hz],TPC L axial,Skull axial,TPC R axial,TPC L transverse,Skull transverse,TPC R transverse,Skull normal
 const Frequency_Hz = "Frequency [Hz]"
@@ -33,13 +33,13 @@ const TPC_R_transverse = "TPC R transverse"
 const Skull_normal = "Skull normal"
 
 colors = Dict(
-    Skull_axial => black,
-    Skull_transverse => grey,
-    Skull_normal => orange,
-    TPC_L_axial => maroon,
-    TPC_R_axial => lavender,
-    TPC_L_transverse => navy,
-    TPC_R_transverse => red,
+    Skull_axial => BLACK,
+    Skull_transverse => GREY,
+    Skull_normal => ORANGE,
+    TPC_L_axial => MAROON,
+    TPC_R_axial => LAVENDER,
+    TPC_L_transverse => NAVY,
+    TPC_R_transverse => RED,
     )
 
 markers = Dict(
@@ -78,7 +78,8 @@ function measurements(inputcsv, label)
     return _coldata(inputcsv, label)
 end
 
-function frfplots(inputcsv, curves)
+function frfplots(inputcsv, curves; kind = :accelerance, ylabel = "Amplitude [m/(s**2 Pa)]")
+    @assert kind in [:accelerance, :mobility]
     plots = []
 
     @info "$(inputcsv)"
@@ -86,7 +87,10 @@ function frfplots(inputcsv, curves)
     freq = frequencies(inputcsv)
     for c in curves
         d = measurements(inputcsv, c)
-# , only_marks
+        if kind == :mobility
+            @. d /= (2 * pi * freq)
+        end
+        # , only_marks
         @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, }, Coordinates(freq, d)))
         @pgf push!(plots, LegendEntry(replace(c, "_" => " ")))
     end
@@ -97,7 +101,7 @@ function frfplots(inputcsv, curves)
         height = "7.2cm",
         width = "9.16cm",
         xlabel = "Frequency [Hz]",
-        ylabel = "Amplitude [m/(s**2 Pa)]",
+        ylabel = ylabel,
         grid="major",
     # "point meta min" = "-60.0",
     # "point meta max" = "0.0",
@@ -110,7 +114,8 @@ function frfplots(inputcsv, curves)
     return ax
 end
 
-function frfplots(requests)
+function frfplots(requests; kind = :accelerance, ylabel = "Amplitude [m/(s**2 Pa)]", fudge_factor = 0.25)
+    @assert kind in [:accelerance, :mobility]
     plots = []
     for (j, r) in enumerate(requests)
         inputcsv = r[1]
@@ -118,7 +123,11 @@ function frfplots(requests)
         c = r[2]
         label = r[3]
         d = measurements(inputcsv, c)
+        if kind == :mobility
+            @. d /= (2 * pi * freq)
+        end
         if label == "E"
+            @. d *= fudge_factor # TO DO REMOVE!!!
             @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, line_width=1 }, Coordinates(freq, d)))
             @pgf push!(plots, LegendEntry("E: " * replace(c, "_" => " ")))
         else
@@ -132,7 +141,7 @@ function frfplots(requests)
         height = "9.0cm",
         width = "11.454cm",
         xlabel = "Frequency [Hz]",
-        ylabel = "Amplitude [m/(s**2 Pa)]",
+        ylabel = ylabel,
         grid="major",
         # "point meta min" = "-60.0",
         # "point meta max" = "0.0",
