@@ -1,4 +1,8 @@
 [deps]
+DataDrop = "aa547a04-dd37-49ab-8e73-656744f8a8fc"
 FRFComparisons = "cc5905fa-0ce8-439f-a041-9cb66eb2e712"
 FRFPlots = "e897d28e-ebda-49ed-b0b2-e9677a268f3d"
+FinEtools = "91bb5406-6c9a-523d-811d-0644c4229550"
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
