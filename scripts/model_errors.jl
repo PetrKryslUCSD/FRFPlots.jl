@@ -16,7 +16,11 @@ filebase = "replica-$(expdir)"
 expdir = "plots_TRANSDEC_13Sept2023"
 experiment = PLOT_DATA * "$(expdir)/AccelOverPressureMs2Pa_TRANSDEC_13Sep2023_0deg_LF_run5_Smooth20lowess.csv"
 model = PLOT_DATA * "plots_sim/gw_fs_real_transdec_Esk=8_Etp=35_m=3_nev=400_a=0_lfs=0_3_lft=0_01_sw=1k.csv"
-filebase = "real-$(expdir)"
+model = PLOT_DATA * "plots_sim/gw_fs_real_transdec_Esk=8_Etp=35_m=3_nev=400_rhos=1100_rhot=2500_a=0_lfs=0_3_lft=0_05_sw=1kd.csv"
+model = PLOT_DATA * "plots_sim/gw_fs_real_transdec_Esk=8_Etp=35_m=3_nev=400_rhos=1100_rhot=2750_a=0_lfs=0_3_lft=0_05_sw=1kd.csv"
+# model = PLOT_DATA * "plots_sim/gw_fs_real_transdec_Esk=8_Etp=35_am=1_m=3_nev=400_rhos=1100_rhot=2500_a=0_lfs=0_3_lft=0_05_sw=1kd-am.csv"
+
+filebase = "real-$(expdir)-1kd"
 
 # Plastic skull in air
 # experiment = PLOT_DATA * "plots_ALab_LACM/AccelMs2_AccelData_waveform_PlasticSkull_UDshaker_SkullBase_18Dec2023_run1.csv"
@@ -39,6 +43,9 @@ for setnames in [
     FRFPlots.TPC_R_transverse,
     FRFPlots.Skull_transverse,
     FRFPlots.Skull_axial,
+    FRFPlots.Skull_normal,
+    FRFPlots.TPC_L_axial,
+    FRFPlots.TPC_R_axial,
 ]
     ax = FRFPlots.frfplots([
         (experiment, setnames, "E"),

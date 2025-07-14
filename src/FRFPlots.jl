@@ -141,10 +141,10 @@ function frfplots(requests; kind = :accelerance, ylabel = "Amplitude [m/(s**2 Pa
         # @show extrema(freq)
         # @show extrema(d)
         if label == "E"
-            @pgf push!(plots, Plot({color = colors[c], mark=markers[c], mark_size=1.5, mark_repeat=20, line_width=1 }, Coordinates(freq, d)))
+            @pgf push!(plots, Plot({color = colors[c[1]], mark=markers[c[1]], mark_size=1.5, mark_repeat=20, line_width=1 }, Coordinates(freq, d)))
             @pgf push!(plots, LegendEntry("E: " * leg))
         else
-            @pgf push!(plots, Plot({color = colors[c], line_width=2 }, Coordinates(freq, d)))
+            @pgf push!(plots, Plot({color = colors[c[1]], line_width=2 }, Coordinates(freq, d)))
             @pgf push!(plots, LegendEntry("M: " * leg))
         end
     end
@@ -309,5 +309,15 @@ end
 function _gof(O, E)
     sum(@. (O - E)^2 / E)
 end
+
+
+function format_number(v)
+    if typeof(v) <: Number && round(v) == v
+        v = Int(v)
+    end
+    s = "$(v)"
+    return replace(s, "." => "_")
+end
+
 
 end # module FRFPlots
